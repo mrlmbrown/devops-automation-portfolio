@@ -19,4 +19,4 @@ labels:
     description: "A bug or unexpected error"
   - name: "enhancement"
     color: "A2EEEF"
-    description: "Proposed improvement"
+    description: "Proposed improvement" 
