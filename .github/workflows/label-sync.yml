@@ -9,5 +9,5 @@ jobs:
     steps:
       - uses: crazy-max/ghaction-github-labeler@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          yaml_file: .github/labels.yml
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          yaml-file: .github/labels.yml
