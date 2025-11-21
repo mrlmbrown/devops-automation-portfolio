@@ -1,102 +1,99 @@
-# Demo Request Intake Automation (n8n)
+# Demo Request Intake Automation (Make.com)
 
 ## 🧩 Overview
 
-This n8n workflow is the **node-based version** of my Make.com “Demo Request Intake” automation.
+This Make.com scenario automates the **demo request intake process** for a SaaS product.
 
 When a prospect submits a demo request form, the workflow:
 
-1. Receives the form payload via **Webhook** (or Form tool integration)
-2. Creates or updates a **Contact** in the CRM (Salesforce / HubSpot)
+1. Captures the submission (Typeform / Webhook / Form tool)
+2. Creates or updates a **contact in the CRM** (Salesforce / HubSpot)
 3. Logs the request in a **tracking sheet** (Google Sheets / Airtable)
-4. Sends a **Slack / MS Teams notification** to the sales / SE channel
-5. Optionally assigns the request to an owner using a **round-robin strategy**
+4. Sends a **Slack / MS Teams notification** to the sales or SE channel
+5. Optionally triggers a **round-robin router** to assign the lead
 
-This scenario shows how I can implement the *same business workflow* in multiple tools, which is a key skill for **Solutions Engineering and Integration roles**.
+This is the kind of automation I use to support **pre-sales, SDR, and Solutions Engineering teams**—reducing manual work and ensuring every request is followed up.
 
 ---
 
 ## ⚙️ Tech Stack
 
-- **Automation Platform:** n8n
-- **Trigger:** Webhook (public URL) or Form integration node
-- **CRM:** Salesforce or HubSpot CRM
-- **Collaboration:** Slack or Microsoft Teams
-- **Reporting:** Google Sheets / Airtable
+- **Automation Platform:** Make.com  
+- **Intake Source:** Typeform (or Webhook module)  
+- **CRM:** Salesforce or HubSpot CRM  
+- **Collaboration:** Slack or Microsoft Teams  
+- **Reporting:** Google Sheets  
 
 ---
 
-## 🔄 Workflow Logic
+## 🔄 Scenario Flow
 
-**Webhook → Transform → CRM → Notify → Log → (Optional) Assign**
+**Trigger → Enrich → Create/Update → Notify → Log**
 
-1. **Webhook Trigger**
-   - `Webhook` node receives form data (`POST`)
-   - Validates required fields (name, email, company, use_case)
+1. **Trigger:**  
+   - Typeform “New Response” module  
+   - (Alternative: Webhooks → Custom form)
 
-2. **Transform Payload**
-   - `Set` / `Function` node normalizes fields
-   - Maps raw form keys to CRM-friendly property names
+2. **Parse & Map Fields:**  
+   - Name, email, company, role  
+   - Use case / interest area  
+   - Preferred demo time or urgency  
 
-3. **Check Existing Contact**
-   - `HTTP Request` → CRM API OR native `Salesforce / HubSpot` node
-   - Searches for contact by email
+3. **CRM Action:**  
+   - Search for existing contact by email  
+   - If found → update record  
+   - If not found → create new contact and (optional) a new deal/opportunity
 
-4. **Branch Logic (IF Node)**
-   - If contact exists → Update record
-   - Else → Create new contact (and optionally a Deal / Opportunity)
+4. **Notification:**  
+   - Post formatted message to Slack/MS Teams:  
+     - Prospect name + company  
+     - Use case summary  
+     - Direct link to CRM record  
+     - Priority flag (e.g. “Enterprise / High Intent”)
 
-5. **Notification**
-   - `Slack` node or `Microsoft Teams` node posts a formatted message with:
-     - Name, company, role
-     - Use case summary
-     - Priority level
-     - Link to CRM record
+5. **Logging:**  
+   - Append a new row in Google Sheets:  
+     - Timestamp, source, owner, status, notes  
 
-6. **Log to Sheet**
-   - `Google Sheets` / `Airtable` node appends a row:
-     - Timestamp, source, owner, status, notes
-
-7. **(Optional) Assignment**
-   - `Function` node + `Google Sheets` / `Airtable` / `Data` node
-   - Implements round-robin owner assignment based on last assigned user
+6. **(Optional) Assignment:**  
+   - Use a **Router** or **Data Store** to assign ownership (SDR/AE/SE) round-robin style.  
 
 ---
 
-## 🧱 n8n Nodes Used
+## 🧱 Make.com Modules Used
 
-- `Webhook`
-- `Set` / `Function`
-- `IF`
-- `HTTP Request` (or `Salesforce` / `HubSpot` nodes)
-- `Slack` / `Microsoft Teams`
-- `Google Sheets` or `Airtable`
-- (Optional) `Code` / additional `HTTP Request` nodes for advanced routing
+- **Typeform / Webhooks** – Trigger on new submission  
+- **Tools → JSON / Text Parser** – Clean and map payload fields  
+- **Salesforce / HubSpot CRM** – Create/Update Contact & Deal  
+- **Slack / MS Teams** – Send channel notification  
+- **Google Sheets** – Add row to “Demo Requests” sheet  
+- **Routers** – Branch logic (new vs existing contact, priority, etc.)  
+- **Data Store (optional)** – Track round-robin ownership  
 
 ---
 
 ## 🗂 Files in This Folder
 
-- `demo-request-intake-n8n.json`  
-  Exported n8n workflow that can be imported into any n8n instance.
+- `demo-request-intake.json`  
+  Exported Make.com scenario (JSON). This is the actual workflow that can be imported into Make.
 
 - `scenario-notes.md`  
-  Detailed design notes, field mappings, and routing rules.
+  Design notes and field mapping used during planning and pre-sales conversations.
 
 - `screenshots/`  
-  - n8n editor canvas
-  - Node configurations
-  - Example Slack/Teams message
+  Visuals from inside Make:
+  - Scenario canvas
+  - Module configuration
+  - Example Slack message
   - Example Google Sheet log
 
 ---
 
 ## 🎯 Business Value
 
-- **Faster follow-up:** Every demo request is captured, logged, and notified automatically.
-- **Better data quality:** Contacts and deals are created/updated consistently.
-- **Better collaboration:** Sales, SEs, and RevOps always know what’s in the queue.
-- **Tool flexibility:** Same workflow can run in Make **or** n8n, depending on stack and customer preference.
+- **Speed to Lead:** No manual re-entry of demo requests.  
+- **Consistency:** Every request is logged, assigned, and visible.  
+- **Collaboration:** Sales, SE, and RevOps can see activity in real time.  
+- **Pre-Sales Enablement:** SEs can quickly see context and use case before the call.  
 
-This project demonstrates my ability to deliver **tool-agnostic automation**—a core capability for any modern Solutions Engineer.
-
+This project is a good example of how I approach **technical discovery → solution design → implementation** as a Solutions Engineer focused on automation and integrations.
