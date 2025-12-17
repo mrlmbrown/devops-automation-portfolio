@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build:
@@ -23,4 +24,3 @@ jobs:
 
       - name: 🔥 Force failure for Make webhook test
         run: exit 1
-
