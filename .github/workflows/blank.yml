@@ -5,11 +5,13 @@ on:
     branches:
       - main
   workflow_dispatch:
-
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -24,3 +26,10 @@ jobs:
 
       - name: 🔥 Force failure for Make webhook test
         run: exit 1
+
+      - name: Notify Make scenario
+        if: always()
+        run: |
+          curl -X POST "${{ secrets.MAKE_WEBHOOK_URL }}" \
+            -H 'Content-Type: application/json' \
+            -d '{"workflow":"CI","status":"${{ job.status }}"}'
