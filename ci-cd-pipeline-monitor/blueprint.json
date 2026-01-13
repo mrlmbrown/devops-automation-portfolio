@@ -1,0 +1,105 @@
+{
+  "name": "CI/CD Pipeline Monitor",
+  "flow": [
+    {
+      "id": 1,
+      "module": "gateway:CustomWebHook",
+      "version": 1,
+      "parameters": {
+        "hook": 1,
+        "maxResults": 1
+      },
+      "mapper": {},
+      "metadata": {
+        "designer": {
+          "x": -391,
+          "y": -126
+        }
+      }
+    },
+    {
+      "id": 2,
+      "module": "builtin:BasicRouter",
+      "version": 1,
+      "mapper": null,
+      "metadata": {
+        "designer": {
+          "x": -52,
+          "y": -121
+        }
+      }
+    },
+    {
+      "id": 3,
+      "module": "slack:SendMessage",
+      "version": 1,
+      "description": "Notify Slack on SUCCESS",
+      "parameters": {
+        "channel": "ci-alerts",
+        "text": "✅ *Build Passed*\nRepo: {{1.body.repository.full_name}}\nBranch: {{1.body.ref}}\nCommit: {{1.body.head_commit.id}}\nAuthor: {{1.body.head_commit.author.name}}"
+      },
+      "filter": {
+        "name": "Build Success",
+        "condition": {
+          "type": "eq",
+          "value1": "{{1.body.workflow_run.conclusion}}",
+          "value2": "success"
+        }
+      },
+      "metadata": {
+        "designer": {
+          "x": 263,
+          "y": -250
+        }
+      }
+    },
+    {
+      "id": 4,
+      "module": "slack:SendMessage",
+      "version": 1,
+      "description": "Notify Slack on FAILURE",
+      "parameters": {
+        "channel": "ci-alerts",
+        "text": "❌ *Build Failed*\nRepo: {{1.body.repository.full_name}}\nBranch: {{1.body.ref}}\nCommit: {{1.body.head_commit.id}}\nAuthor: {{1.body.head_commit.author.name}}"
+      },
+      "filter": {
+        "name": "Build Failure",
+        "condition": {
+          "type": "eq",
+          "value1": "{{1.body.workflow_run.conclusion}}",
+          "value2": "failure"
+        }
+      },
+      "metadata": {
+        "designer": {
+          "x": 273,
+          "y": -14
+        }
+      }
+    },
+    {
+      "id": 5,
+      "module": "google-sheets:AppendRow",
+      "version": 1,
+      "description": "Log CI/CD activity to Google Sheets",
+      "parameters": {
+        "sheetId": "YOUR_SHEET_ID",
+        "range": "Logs!A1",
+        "values": [
+          "{{1.body.repository.full_name}}",
+          "{{1.body.workflow_run.status}}",
+          "{{1.body.workflow_run.conclusion}}",
+          "{{1.body.head_commit.id}}",
+          "{{1.body.head_commit.author.name}}",
+          "{{1.body.workflow_run.updated_at}}"
+        ]
+      },
+      "metadata": {
+        "designer": {
+          "x": 265,
+          "y": 125
+        }
+      }
+    }
+  ]
+}
